@@ -26,8 +26,8 @@ var (
 
 var args struct {
 	From    string            `usage:"[URL] of a tar.gz archive to download. May contain Go template references to 'var' entries."`
-	Var     map[string]string `usage:"Sets variables that can be referenced in 'from'. Format is [name=value]"`
-	File    string            `usage:"The [path] to executable to extract within archive"`
+	Var     map[string]string `usage:"Sets variables that can be referenced in 'from' and 'file'. Format is [name=value]"`
+	File    string            `usage:"The [path] to executable to extract within archive. May contain Go template references to 'var' entries."`
 	To      string            `usage:"The [path] where executable will be placed" default:"/usr/local/bin"`
 	Mkdirs  bool              `usage:"Attempt to create the directory path specified by to"`
 	Version bool              `usage:"Show version and exit"`
@@ -56,6 +56,11 @@ func main() {
 	from, err := evaluateFromTemplate(args.From, args.Var)
 	if err != nil {
 		log.Fatalf("failed to evaluate 'from': %s", err)
+	}
+
+	file, err := evaluateFromTemplate(args.File, args.Var)
+	if err != nil {
+		log.Fatalf("failed to evaluate 'file': %s", err)
 	}
 
 	if !isTarGz(from) {
